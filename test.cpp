@@ -1,9 +1,12 @@
 #include <iostream>
-
+#include <string>
+#include <sstream>
 #include <generator.hpp>
 
 using std::cout;
 using std::endl;
+using std::string;
+using std::stringstream;
 
 class test: public generator
 {
@@ -23,13 +26,40 @@ protected:
     }
 };
 
+class test2: public generic_generator<string>
+{
+protected:
+    void body() {
+        for(int i=0; i<5; i++) {
+            stringstream ss;
+            ss << "send: " << i;
+            yield_send(ss.str());
+        }
+    }
+};
+
 int main(){
     test t;
     while(true) {
         try {
             t.next();
         }
-        catch(const generator::stop_iteration& e) {
+        catch(const stop_iteration& e) {
+            cout << "end" << endl;
+            break;
+        }
+    }
+
+    test2 t2;
+    while(true) {
+        try {
+            string data;
+            t2.next();
+            if(t2.receive(&data)) {
+                cout << "next ret: " << data << endl;
+            }
+        }
+        catch(const stop_iteration& e) {
             cout << "end" << endl;
             break;
         }
