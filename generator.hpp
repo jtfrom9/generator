@@ -48,7 +48,10 @@ public:
         if(swapcontext(&_context_parent, &_context_child) == -1)
             throw std::runtime_error("next: fail @ swapcontext");
     }
-
+    bool end() {
+        return _end;
+    }
+    
 protected:
     void _yield() {
         if(swapcontext(&_context_child, &_context_parent) == -1)
@@ -74,6 +77,8 @@ public:
     {}
 
     bool receive(T* pdata) {
+        if(end())
+            return false;
         if(_has_data && pdata!= 0 )
             *pdata = _data;
         return _has_data;
